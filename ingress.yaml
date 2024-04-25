@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: services
+  namespace: booking
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /user-service
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8001
+#          - pathType: Prefix
+#            path: /accommodation-service
+#            backend:
+#              service:
+#                name: accommodation-service
+#                port:
+#                  number: 8002
+#          - pathType: Prefix
+#            path: /reservation-service
+#            backend:
+#              service:
+#                name: reservation-service
+#                port:
+#                  number: 8003
+#          - path: /
+#            pathType: Exact
+#            backend:
+#              service:
+#                name: frontend-service
+#                port:
+#                  number: 3000
