@@ -19,7 +19,32 @@ spec:
       containers:
         - name: user-service
           image: katarinakomad/user-service
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8001
+          env:
+            - name: POSTGRESQL_HOST
+              value: "postgres"
+            - name: POSTGRESQL_PORT
+              value: "5432"
+            - name: POSTGRESQL_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: db-configmap
+                  key: USER_SERVICE_DB
+            - name: POSTGRESQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_USER
+                  optional: false
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_PASSWORD
+                  optional: false
+
           # livenessProbe:
           #   httpGet:
           #     port: 8000
