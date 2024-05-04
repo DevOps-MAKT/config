@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-names-configmap
+  namespace: booking
+data:
+  TEST_DB: testDB
+  USER_SERVICE_DB: userDB
+  RESERVATION_SERVICE_DB: reservationDB
+  ACCOMMODATION_SERVICE_DB: accommodationDB
