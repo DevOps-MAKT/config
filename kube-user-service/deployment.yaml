@@ -16,6 +16,37 @@ spec:
       labels:
         app: user-service
     spec:
+      initContainers:
+        - name: init-database
+          image: postgres:latest
+          command: [ "bash", "-c", "createdb -h $POSTGRESQL_HOST -p 5432 -U $POSTGRES_USER $DB_NAME || true"]
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_PASSWORD
+                  optional: false
+            - name: POSTGRESQL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRESQL_HOST
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRES_USER
+            - name: POSTGRESQL_MAIN_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRESQL_MAIN_DB
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: db-names-configmap
+                  key: USER_SERVICE_DB
       containers:
         - name: user-service
           image: katarinakomad/user-service
@@ -23,14 +54,21 @@ spec:
           ports:
             - containerPort: 8001
           env:
+            # db values
             - name: POSTGRESQL_HOST
-              value: "postgres"
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRESQL_HOST
             - name: POSTGRESQL_PORT
-              value: "5432"
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: POSTGRESQL_PORT
             - name: POSTGRESQL_DB
               valueFrom:
                 configMapKeyRef:
-                  name: db-configmap
+                  name: db-names-configmap
                   key: USER_SERVICE_DB
             - name: POSTGRESQL_USERNAME
               valueFrom:
@@ -44,16 +82,31 @@ spec:
                   name: db-secret
                   key: POSTGRES_PASSWORD
                   optional: false
-
+            # DB CONFIG
+            - name: INIT_DATA_SCRIPT
+              valueFrom:
+                configMapKeyRef:
+                  name: db-dev-configmap
+                  key: INIT_DATA_SCRIPT
+            - name: CREATE_DB_OPTION
+              valueFrom:
+                configMapKeyRef:
+                  name: db-dev-configmap
+                  key: CREATE_DB_OPTION
+            - name: INIT_DATA_BOOL
+              valueFrom:
+                configMapKeyRef:
+                  name: db-dev-configmap
+                  key: INIT_DATA_BOOL
           # livenessProbe:
           #   httpGet:
-          #     port: 8000
+          #     port: 8001
           #     path: /probe/liveness
           #   initialDelaySeconds: 3
           #   periodSeconds: 3
           # readinessProbe:
           #   httpGet:
-          #     port: 8000
+          #     port: 8001
           #     path: /probe/readiness
           #   initialDelaySeconds: 3
           #   periodSeconds: 3
