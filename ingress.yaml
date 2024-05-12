@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: services
   namespace: booking
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
@@ -15,6 +17,15 @@ spec:
                 name: user-service
                 port:
                   number: 8001
+    - http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: nextjs-kube-service
+                port:
+                  number: 3000
 #          - pathType: Prefix
 #            path: /accommodation-service
 #            backend:
@@ -29,10 +40,3 @@ spec:
 #                name: reservation-service
 #                port:
 #                  number: 8003
-#          - path: /
-#            pathType: Exact
-#            backend:
-#              service:
-#                name: frontend-service
-#                port:
-#                  number: 3000
