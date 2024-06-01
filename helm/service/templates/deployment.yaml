@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "service.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "service.labels" . | nindent 4 }}
+  annotations:
+    checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+spec:
+  replicas:  {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      name: {{ .Values.name }}
+      labels:
+        {{- include "service.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "service.fullname" . }}-account
+      initContainers:
+        - name: init-database
+          image: postgres:latest
+          command: [ "bash", "-c", "createdb -h $POSTGRESQL_HOST -p $POSTGRESQL_PORT -U $POSTGRES_USER $POSTGRESQL_DB || true"]
+          envFrom:
+            - configMapRef:
+                name: {{ include "service.fullname" . }}
+
+            - configMapRef:
+                name: postgres-configmap  # must use deployed postgres configuration
+            - secretRef:
+                name: postgres-secret   # must use deployed postgres secrets
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.deployment.image }}:{{ .Values.deployment.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: {{ .Values.deployment.containerPort }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "service.fullname" . }}
+            - secretRef:
+                name: {{ include "service.fullname" . }}
+
+            - configMapRef:
+                name: postgres-configmap  # must use deployed postgres configuration
+            - secretRef:
+                name: postgres-secret   # must use deployed postgres secrets
+#          livenessProbe:
+#            initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
+#            httpGet:
+#             port: http
+#             path:  {{ .Values.deployment.probes.livenessPath }}
+#          readinessProbe:
+#             httpGet:
+#               port: http
+#               path: {{ .Values.deployment.probes.readinessPath }}
+#             initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
+      restartPolicy: Always
