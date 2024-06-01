@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: katarinakomad/frontend
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+
+nameOverride: "frontend"
+fullnameOverride: "frontend"
+namespace: helm-booking
+
+podAnnotations: {}
+podLabels: {}
+
+
+service:
+  type: NodePort
+  port: 3000
+
+resources:
+   limits:
+     cpu: "500m"
+     memory: "128Mi"
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+configmap:
+  data:
+    NEXT_PUBLIC_USER_SERVICE_API: "http://localhost:80/api/user-service"
+    NEXT_PUBLIC_ACCOMMODATION_SERVICE_API: "http://localhost:80/api/accommodation-service"
+    NEXT_PUBLIC_RESERVATION_SERVICE_API: "http://localhost:80/api/reservation-service"
