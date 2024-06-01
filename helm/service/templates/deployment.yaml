@@ -19,7 +19,6 @@ spec:
       labels:
         {{- include "service.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "service.fullname" . }}-account
       initContainers:
         - name: init-database
           image: postgres:latest
