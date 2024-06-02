@@ -1,0 +1,31 @@
+nameOverride: "user-service"
+fullnameOverride: "user-service"
+
+namespace: "helm-booking"
+
+
+deployment:
+  image: "katarinakomad/user-service"
+  tag: "latest"
+  replicaCount: 1
+  containerPort: 8001
+  probes:
+    initialDelaySeconds: 3
+    livenessPath: /probe/liveness
+    readinessPath: /probe/readiness
+
+service:
+  type: ClusterIP
+  port: 8001
+
+configmap:
+  data:
+    INIT_DATA_SCRIPT: "import.sql"
+    INIT_DATA_BOOL: "true"
+    CREATE_DB_OPTION: "drop-and-create"
+    POSTGRESQL_DB: "userDB"
+    ACCOMMODATION_SERVICE_API: "http://accommodation-service:8002/api/accommodation-service"
+    RESERVATION_SERVICE_API: "http://reservation-service:8003/api/reservation-service"
+
+
+secret: {}

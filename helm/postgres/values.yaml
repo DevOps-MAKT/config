@@ -1,0 +1,53 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  pullPolicy: IfNotPresent
+  tag: "15.0"
+
+namespace: "helm-booking"
+
+imagePullSecrets: []
+nameOverride: "postgres"
+fullnameOverride: "postgres"
+
+service:
+  type: ClusterIP
+  port: 5432
+  clusterIP: None
+
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts:
+  - name: postgresql-db-disk
+    mountPath: /var/lib/postgresql
+#   readOnly: true
+
+
+volumeClaimTemplate:
+  - storage: 100Mi
+
+configmap:
+  data:
+    # needed for postgres statefulSet
+    PGDATA: "/var/lib/postgresql/pgdata"
+    # custom
+    POSTGRESQL_HOST: "postgres"
+    # custom
+    POSTGRESQL_PORT: "5432"
+
+secret:
+  data:
+    # needed for both postgres statefulSet and initContainer
+    POSTGRES_USER: cG9zdGdyZXM=
+    # needed for shell script inside initContainer of Service Deployment
+    PGPASSWORD: cm9vdA==
+    # needed for postgres statefulSet
+    POSTGRES_PASSWORD: cm9vdA==
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
