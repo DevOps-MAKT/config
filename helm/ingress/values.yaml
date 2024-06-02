@@ -20,6 +20,10 @@ services:
       path: '/api/reservation-service'
       port: 8003
   - service:
+      name: 'notification-service'
+      path: '/api/notification-service'
+      port: 8004
+  - service:
       name: 'frontend'
       path: '/?(.*)'
       port: 3000
