@@ -1,0 +1,115 @@
+helm installation
+
+1) Download link
+https://github.com/helm/helm/releases?fbclid=IwZXh0bgNhZW0CMTAAAR0WslwbFZqEpliYvzfcp9y3_xhnn1JdRhzQWy-P-4E7qb_PEh4SqD31r5g_aem_AXGJXoat6erojXwJ2WmtWGinfZDJtP3EQk8ZkxSb3ISy01DBkfDL9co2TVpP_-bgSUPnSXQ9P5j1WxKObFhePln4
+2)+ add to system vars Path...
+
+3)Initialize a Helm Chart Repository
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+
+	helm search repo bitnami --> to search locally
+
+4) Download helm charts if neccessary (search online)
+https://artifacthub.io/packages/search?kind=0&sort=relevance&page=1
+
+
+helm status [helm_chart_name]
+
+
+helm create [new_chart_name]
+
+helm template [chart_name] [chart_path]
+
+helm install [chart_name] [chart_path] --> deploy a chart
+helm list --> list all our releases
+kubectl get all --> see our deployed components
+
+helm upgrade [chart_name] [chart_path] --values values.yaml
+
+ helm template postgres  .\postgres\ --values .\postgres\values.yaml --namespace helm-booking
+ helm install postgres  .\postgres\ --values .\postgres\values.yaml --namespace helm-booking
+ helm upgrade postgres  .\postgres\ --values .\postgres\values.yaml --namespace helm-booking
+ helm delete postgres  -n helm-booking
+
+ helm template user-service .\service\ --values .\service\user-service-dev-values.yaml --namespace helm-booking
+ helm install user-service  .\service\ --values .\service\user-service-dev-values.yaml --namespace helm-booking
+ helm upgrade user-service  .\service\ --values  .\service\user-service-dev-values.yaml --namespace helm-booking
+ helm delete user-service -n helm-booking
+
+ helm template accommodation-service .\service\ --values .\service\accommodation-service-dev-values.yaml --namespace helm-booking
+ helm install accommodation-service  .\service\ --values .\service\accommodation-service-dev-values.yaml --namespace helm-booking
+ helm upgrade accommodation-service  .\service\ --values  .\service\accommodation-service-dev-values.yaml --namespace helm-booking
+ helm delete accommodation-service -n helm-booking
+
+helm template reservation-service .\service\ --values .\service\reservation-service-dev-values.yaml --namespace helm-booking
+ helm install reservation-service  .\service\ --values .\service\reservation-service-dev-values.yaml --namespace helm-booking
+ helm upgrade reservation-service  .\service\ --values  .\service\reservation-service-dev-values.yaml --namespace helm-booking
+ helm delete reservation-service -n helm-booking
+
+helm template notification-service .\service\ --values .\service\notification-service-dev-values.yaml --namespace helm-booking
+ helm install notification-service  .\service\ --values .\service\notification-service-dev-values.yaml --namespace helm-booking
+ helm upgrade notification-service  .\service\ --values  .\service\notification-service-dev-values.yaml --namespace helm-booking
+ helm delete notification-service -n helm-booking
+
+ helm template frontend .\frontend\ --values .\frontend\values.yaml --namespace helm-booking
+ helm install frontend .\frontend\ --values .\frontend\values.yaml --namespace helm-booking
+ helm upgrade frontend .\frontend\ --values .\frontend\values.yaml --namespace helm-booking
+ helm delete frontend -n helm-booking
+
+
+ helm template ingress  .\ingress\ --values .\ingress\values.yaml --namespace helm-booking
+ helm install ingress  .\ingress\ --values .\ingress\values.yaml --namespace helm-booking
+ helm upgrade ingress  .\ingress\ --values .\ingress\values.yaml --namespace helm-booking
+ helm delete ingress  -n helm-booking
+
+
+helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace helm-booking
+
+
+
+        <!--   METRICS     -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <!--   TRACING     -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jaeger</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-opentracing</artifactId>
+        </dependency>
+
+
+
+
+quarkus.application.name=reservation-service
+
+
+quarkus.micrometer.export.prometheus.enabled=true
+quarkus.micrometer.export.prometheus.path=/metrics
+
+
+quarkus.jaeger.enabled = true
+quarkus.jaeger.endpoint=${JAEGER_ENDPOINT:http://localhost:14268/api/traces}
+quarkus.jaeger.service-name = reservation-service
+
+quarkus.jaeger.sampler-type=const
+quarkus.jaeger.sampler-param=1
+quarkus.jaeger.log-trace-context=true
+
+quarkus.log.console.format=%d{HH:mm:ss} %-5p traceId=%X{traceId}, parentId=%X{parentId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n 
+
+
+
+
+
+
+
