@@ -1,10 +1,10 @@
 replicaCount: 1
 
 image:
-  repository: katarinakomad/frontend
+  repository: teodorsakalfranciskovic/nextjs-kube-integration
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "0.23.0"
 
 
 nameOverride: "frontend"
@@ -36,3 +36,4 @@ configmap:
     NEXT_PUBLIC_USER_SERVICE_API: "http://localhost:80/api/user-service"
     NEXT_PUBLIC_ACCOMMODATION_SERVICE_API: "http://localhost:80/api/accommodation-service"
     NEXT_PUBLIC_RESERVATION_SERVICE_API: "http://localhost:80/api/reservation-service"
+    NEXT_PUBLIC_NOTIFICATION_SERVICE_API: "http://localhost:80/api/notification-service"

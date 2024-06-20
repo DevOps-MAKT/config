@@ -49,14 +49,14 @@ spec:
                 name: postgres-configmap  # must use deployed postgres configuration
             - secretRef:
                 name: postgres-secret   # must use deployed postgres secrets
-#          livenessProbe:
-#            initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
-#            httpGet:
-#             port: http
-#             path:  {{ .Values.deployment.probes.livenessPath }}
-#          readinessProbe:
-#             httpGet:
-#               port: http
-#               path: {{ .Values.deployment.probes.readinessPath }}
-#             initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
+            httpGet:
+             port: http
+             path:  {{ .Values.deployment.probes.livenessPath }}
+          readinessProbe:
+             httpGet:
+               port: http
+               path: {{ .Values.deployment.probes.readinessPath }}
+             initialDelaySeconds: {{ .Values.deployment.probes.initialDelaySeconds }}
       restartPolicy: Always
