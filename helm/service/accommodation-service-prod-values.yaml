@@ -6,13 +6,13 @@ namespace: "helm-booking"
 
 deployment:
   image: "katarinakomad/accommodation-service"
-  tag: "latest"
+  tag: "0.14.0"
   replicaCount: 1
   containerPort: 8002
   probes:
     initialDelaySeconds: 3
-    livenessPath: /probe/liveness
-    readinessPath: /probe/readiness
+    livenessPath: /q/health/live
+    readinessPath: /q/health/ready
 
 service:
   type: ClusterIP
@@ -26,5 +26,15 @@ configmap:
     POSTGRESQL_DB: "accommodationDB"
     USER_SERVICE_API: "http://user-service:8001/api/user-service"
     RESERVATION_SERVICE_API: "http://reservation-service:8003/api/reservation-service"
+    NOTIFICATION_SERVICE_API: "http://notification-service:8004/api/notification-service"
+    JAEGER_ENDPOINT: "http://jaeger-collector.monitoring:14268/api/traces"
+
+servicemonitor:
+  enabled: true # enabled by default
+  interval: 15s
+  path: /metrics
+
+alerts:
+  enabled: false
 
 secret: {}

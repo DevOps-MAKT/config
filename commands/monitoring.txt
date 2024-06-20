@@ -1,0 +1,52 @@
+kubectl create ns monitoring
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+############## HELM - kube-prometheus-stack ############## 
+
+helm upgrade --install -f values.yaml 			    kube-prometheus-stack prometheus-community/kube-prometheus-stack -n monitoring
+helm upgrade --install -f monitoring\monitoring-values.yaml kube-prometheus-stack prometheus-community/kube-prometheus-stack -n monitoring
+
+
+helm delete kube-prometheus-stack -n monitoring
+
+############## HELM - PROMTAIL I LOKI ############## 
+
+helm upgrade --install loki grafana/loki-stack -n monitoring
+
+
+############## GRAFANA DASHBOARD ############## 
+
+kubectl -n monitoring get pods
+kubectl exec -it -n monitoring kube-prometheus-stack-grafana-6b8595d7c-9z9jw /bin/bash
+grafana-cli admin reset-admin-password $GF_SECURITY_ADMIN_PASSWORD
+
+minikube -n monitoring service kube-prometheus-stack-grafana --url
+
+username: admin
+password: prom-operator
+
+
+############## PROMETHEUS DASHBOARD ############## 
+
+minikube -n monitoring service kube-prometheus-stack-prometheus --url
+
+
+############## TRACING ############## 
+
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+# Jeager requires cert-manager
+helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true --wait
+
+
+# instalacija CRD-a: jaeger operator
+
+kubectl -n monitoring apply -f monitoring\custom-jaeger-operator.yaml
+(kubectl -n observability apply -f  https://github.com/jaegertracing/jaeger-operator/releases/download/v1.39.0/jaeger-operator.yaml)
+
+# instalacija jaeger-a
+kubectl -n observability apply -f monitoring\jaeger.yaml

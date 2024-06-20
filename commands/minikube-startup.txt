@@ -1,0 +1,59 @@
+1. minikube start
+2. minikube kubectl -- get pods -A
+
+3. minikube addons enable ingress
+4. minikube tunnel
+
+5. minikube dashboard
+6. minikube addons enable metrics-server
+
+
+// minikube completion
+
+7. minikube completion powershell > $HOME\.minikube-completion.ps1
+8. Add-Content $PROFILE '. $HOME\.minikube-completion.ps1'
+9. Add-Content $PROFILE 'if (Get-Command minikube -ErrorAction SilentlyContinue) {
+	   minikube completion powershell | Out-String | Invoke-Expression
+   }'
+
+// kubectl completion
+10. kubectl completion powershell >> $PROFILE
+
+
+// NAMESPACE
+kubectl create namespace booking 
+
+// DOCKER HUB SECRET
+kubectl create secret -n booking docker-registry regcred --docker-server=https://index.docker.io/v1/ --docker-username=katarinakomad --docker-password=katarina26 --docker-email=komad.katarina@gmail.com
+
+// SLEEP FIX
+minikube pause -A
+minikube unpause -A
+
+// KANIKO
+
+kubectl apply -f .\kaniko-pod.yaml -f .\kaniko-volume.yaml -f .\kaniko-volume-claim.yaml
+kubectl delete -f .\kaniko-pod.yaml -f .\kaniko-volume.yaml -f .\kaniko-volume-claim.yaml
+
+kubectl apply -n booking -f .\kaniko-volume.yaml
+kubectl apply -n booking -f .\kaniko-volume-claim.yaml
+kubectl apply -n booking -f .\kaniko-pod-github.yaml
+kubectl apply -n booking -f .\kaniko-pod-dockerfile.yaml
+
+kubectl -n booking get pvc
+kubectl -n booking get pv
+
+kubectl -n booking describe pod kaniko
+
+kubectl -n booking delete pod kaniko
+kubectl -n booking delete pvc dockerfile-claim
+kubectl -n booking delete pv dockerfile
+
+
+kubectl -n booking create configmap dockerfile-config --from-file=Dockerfile
+kubectl -n booking create configmap dockerfile-config-user-service --from-file=Dockerfile
+
+// POSTGTRES
+
+kubectl -n booking create secret generic postgresql --from-literal POSTGRES_USERNAME="postgres" --from-literal POSTGRES_PASSWORD="root" --from-literal POSTGRES_DB="devops"
+
