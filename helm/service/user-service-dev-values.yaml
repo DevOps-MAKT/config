@@ -1,0 +1,80 @@
+nameOverride: "user-service"
+fullnameOverride: "user-service"
+
+namespace: "helm-booking"
+
+
+deployment:
+  image: "katarinakomad/user-service"
+  tag: "0.25.2"
+  replicaCount: 1
+  containerPort: 8001
+  probes:
+    initialDelaySeconds: 3
+    livenessPath: /q/health/live
+    readinessPath: /q/health/ready
+
+service:
+  type: ClusterIP
+  port: 8001
+
+configmap:
+  data:
+    INIT_DATA_SCRIPT: "import.sql"
+    INIT_DATA_BOOL: "true"
+    CREATE_DB_OPTION: "drop-and-create"
+    POSTGRESQL_DB: "userDB"
+    ACCOMMODATION_SERVICE_API: "http://accommodation-service:8002/api/accommodation-service"
+    RESERVATION_SERVICE_API: "http://reservation-service:8003/api/reservation-service"
+    NOTIFICATION_SERVICE_API: "http://notification-service:8004/api/notification-service"
+    JAEGER_ENDPOINT: "http://jaeger-collector.observability:14268/api/traces"
+
+servicemonitor:
+  enabled: true # enabled by default
+  interval: 15s
+  path: /metrics
+
+
+alerts:
+  enabled: false
+#  rules:
+#    TooManyRequests:
+#      summary: "Service /login endpoint too many requests"
+#      description: "User service /login endpoint too many requests"
+#      expr: "gin_requests_total{url='/login'} > 2"
+#      for: 5m
+#      severity: warning
+#      enabled: true
+#
+#    HTTP5XXErrors:
+#      summary: "Service's 5XX Response Rate More than .1%"
+#      description: "ServiceName 5XX Response Rate Alert"
+#      expr: "sum(rate(api_responses{status=~'5.*'}[5m])) / sum(rate(api_responses[5m])) > .001"
+#      for: 5m
+#      severity: warning
+#      enabled: true
+
+
+#dashboards: []
+##  - app: <base64 encoded dashboard json configuration>
+
+#dashboardProviders:
+#  dashboardproviders.yml:
+#    apiVersion: 1
+#    providers:
+#      - name: 'default'
+#        orgId: 1
+#        folder: ''
+#        type: file
+#        disableDeletion: false
+#        editable: true
+#        options:
+#          path: /var/lib/grafana/dashboards/default
+#dashboards:
+#  default:
+#    kubernetes:
+#      gnetId: 10000
+#      revision: 1
+#      datasource: Prometheus
+
+secret: {}

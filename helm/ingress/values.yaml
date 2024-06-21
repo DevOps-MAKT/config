@@ -1,0 +1,29 @@
+ingress:
+  namespace: "helm-booking"
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  tls: []
+
+services:
+  - service:
+      name: 'user-service'
+      path: '/api/user-service'
+      port: 8001
+  - service:
+      name: 'accommodation-service'
+      path: '/api/accommodation-service'
+      port: 8002
+  - service:
+      name: 'reservation-service'
+      path: '/api/reservation-service'
+      port: 8003
+  - service:
+      name: 'notification-service'
+      path: '/api/notification-service'
+      port: 8004
+  - service:
+      name: 'frontend'
+      path: '/?(.*)'
+      port: 3000

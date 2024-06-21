@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: services
+  namespace: booking
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            path: /user-service
+            backend:
+              service:
+                name: user-service
+                port:
+                  number: 8001
+    - http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: nextjs-kube-service
+                port:
+                  number: 3000
+#          - pathType: Prefix
+#            path: /accommodation-service
+#            backend:
+#              service:
+#                name: accommodation-service
+#                port:
+#                  number: 8002
+#          - pathType: Prefix
+#            path: /reservation-service
+#            backend:
+#              service:
+#                name: reservation-service
+#                port:
+#                  number: 8003

@@ -1,0 +1,23 @@
+
+Total number of HTTP requests:
+sum(increase(http_server_requests_seconds_count{uri!="/metrics", service="user-service"}[24h]))
+
+Number of successful HTTP requests (2xx, 3xx):
+sum(increase(http_server_requests_seconds_count{status=~"[23]..", uri!="/metrics", service="user-service"}[24h]))
+
+
+Number of unsuccessful HTTP requests (4xx, 5xx):
+sum(increase(http_server_requests_seconds_count{status=~"[45]..", uri!="/metrics", service="user-service"}[24h]))
+
+Number of unique visitors (based on IP address):
+count(count_over_time(http_server_requests_seconds_count[24h]) by (remote_addr))
+
+Number of 404 errors and their endpoints:
+
+sum(increase(http_server_requests_seconds_count{status="404"}[24h])) by (uri)
+sum(rate(http_requests_total{status="404"}[24h])) by (endpoint)
+
+Total traffic in GB:
+If you are tracking the request size and response size metrics, you can sum them up and convert to GB:
+sum(rate(http_server_requests_size_bytes_sum[24h])) + sum(rate(http_server_responses_size_bytes_sum[24h])) / 1e9
+

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-prod-configmap
+  namespace: booking
+data:
+  INIT_DATA_SCRIPT: "no-file"
+  INIT_DATA_BOOL: "false"
+  CREATE_DB_OPTION: "none"

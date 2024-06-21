@@ -1,0 +1,42 @@
+name: reservation-service
+
+nameOverride: "reservation-service"
+fullnameOverride: "reservation-service"
+
+namespace: "helm-booking"
+
+
+deployment:
+  image: "katarinakomad/reservation-service"
+  tag: "0.18.0"
+  replicaCount: 1
+  containerPort: 8003
+  probes:
+    initialDelaySeconds: 3
+    livenessPath: /q/health/live
+    readinessPath: /q/health/ready
+
+service:
+  type: ClusterIP
+  port: 8003
+
+configmap:
+  data:
+    INIT_DATA_SCRIPT: "no-file"
+    INIT_DATA_BOOL: "false"
+    CREATE_DB_OPTION: "none"
+    POSTGRESQL_DB: "userDB"
+    ACCOMMODATION_SERVICE_API: "http://accommodation-service:8002/api/accommodation-service"
+    USER_SERVICE_API: "http://user-service:8001/api/user-service"
+    NOTIFICATION_SERVICE_API: "http://notification-service:8004/api/notification-service"
+    JAEGER_ENDPOINT: "http://jaeger-collector.monitoring:14268/api/traces"
+
+servicemonitor:
+  enabled: true # enabled by default
+  interval: 15s
+  path: /metrics
+
+alerts:
+  enabled: false
+
+secret: {}
